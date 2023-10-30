@@ -2,7 +2,6 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::io;
 
-
 type AVLTreePtr<T> = Option<Rc<RefCell<AVLNode<T>>>>;
 
 #[derive(Debug, Clone)]
@@ -19,7 +18,6 @@ struct AVLTree<T: Ord + Clone> {
 }
 
 impl<T: Ord + Clone> AVLNode<T> {
-    
     fn new(value: T) -> Rc<RefCell<Self>> {
         Rc::new(RefCell::new(AVLNode {
             value,
@@ -28,7 +26,7 @@ impl<T: Ord + Clone> AVLNode<T> {
             height: 1,
         }))
     }
-    
+
     fn balance_factor(&self) -> isize {
         let lh = self.left.as_ref().map_or(0, |l| l.borrow().height);
         let rh = self.right.as_ref().map_or(0, |r| r.borrow().height);
@@ -40,7 +38,6 @@ impl<T: Ord + Clone> AVLNode<T> {
         let rh = self.right.as_ref().map_or(0, |r| r.borrow().height);
         self.height = 1 + std::cmp::max(lh, rh);
     }
-
 }
 
 impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
@@ -74,45 +71,39 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
     }
 
     pub fn insert(&mut self, value: T) {
-        let new_node = AVLNode::new(value);
         if self.root.is_none() {
-            self.root = Some(new_node);
+            self.root = Some(AVLNode::new(value));
         } else {
             let taken_root = self.root.take();
-            self.root = Some(self.insert_rec(taken_root, Some(new_node)));
-        }
-    }
-    // 
-    fn insert_rec(&self, node: AVLTreePtr<T>, new_node: AVLTreePtr<T>) -> Rc<RefCell<AVLNode<T>>> {
-        if let Some(current_node) = node {
-            let new_value = new_node.as_ref().unwrap().borrow().value.clone();
-            
-            {
-                let mut current_node_ref = current_node.borrow_mut();
-                if new_value < current_node_ref.value {
-                    let left_child = current_node_ref.left.take();
-                    current_node_ref.left = Some(self.insert_rec(left_child, new_node.clone()));
-                } else if new_value > current_node_ref.value {
-                    let right_child = current_node_ref.right.take();
-                    current_node_ref.right = Some(self.insert_rec(right_child, new_node.clone()));
-                } else {
-                    return current_node.clone();
-                }
-            }
-            current_node.borrow_mut().update_height();
-            self.balance(current_node)
-        } else {
-            new_node.unwrap()
+            self.root = Some(self.insert_rec(taken_root, value));
         }
     }
     
+    // 
+    fn insert_rec(&self, node: AVLTreePtr<T>, value: T) -> Rc<RefCell<AVLNode<T>>> {
+        let current_node = node.clone().unwrap_or_else(|| AVLNode::new(value.clone()));
+        {
+            let mut current_node_ref = current_node.borrow_mut();
+            if value < current_node_ref.value {
+                current_node_ref.left = Some(self.insert_rec(current_node_ref.left.clone(), value));
+            } else if value > current_node_ref.value {
+                current_node_ref.right = Some(self.insert_rec(current_node_ref.right.clone(), value));
+            } else {
+                return current_node.clone();
+            }
+            current_node_ref.update_height();
+        }
+        self.balance(current_node)
+    }
+
     fn balance(&self, node: Rc<RefCell<AVLNode<T>>>) -> Rc<RefCell<AVLNode<T>>> {
         let balance_factor = node.borrow().balance_factor();
 
         // Left heavy
         if balance_factor > 1 {
-            if node.borrow().left.as_ref().unwrap().borrow().balance_factor() < 0 {
-                let left_child = node.borrow_mut().left.take().unwrap();
+            let left_child_balance = node.borrow().left.as_ref().unwrap().borrow().balance_factor();
+            if left_child_balance < 0 {
+                let left_child = node.borrow_mut().left.clone().unwrap();
                 node.borrow_mut().left = Some(self.rotate_left(left_child));
             }
             return self.rotate_right(node);
@@ -120,9 +111,10 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
 
         // Right heavy
         if balance_factor < -1 {
-            if node.borrow().right.as_ref().unwrap().borrow().balance_factor() > 0 {
-                let right_child = node.borrow_mut().right.take().unwrap();
-                node.borrow_mut().right = Some(self.rotate_left(right_child));
+            let right_child_balance = node.borrow().right.as_ref().unwrap().borrow().balance_factor();
+            if right_child_balance > 0 {
+                let right_child = node.borrow_mut().right.clone().unwrap();
+                node.borrow_mut().right = Some(self.rotate_right(right_child));
             }
             return self.rotate_left(node);
         }
@@ -131,21 +123,26 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
     }
 
     fn rotate_left(&self, x: Rc<RefCell<AVLNode<T>>>) -> Rc<RefCell<AVLNode<T>>> {
-        let y = x.borrow_mut().right.take().unwrap();
-        let t2 = y.borrow_mut().left.take();
+        println!("Rotating left node with value: {}", x.borrow().value);
 
+        let y = x.borrow_mut().right.take().expect("rotate_left requires a right child");
+        let t2 = y.borrow_mut().left.take();
+    
         // Perform rotation
         y.borrow_mut().left = Some(x.clone());
         x.borrow_mut().right = t2;
-
+    
         // Update heights
         x.borrow_mut().update_height();
         y.borrow_mut().update_height();
-
+    
         y
     }
+    
 
     fn rotate_right(&self, y: Rc<RefCell<AVLNode<T>>>) -> Rc<RefCell<AVLNode<T>>> {
+        println!("Rotating right node with value: {}", y.borrow().value);
+
         let x = y.borrow_mut().left.take().unwrap();
         let t3 = x.borrow_mut().right.take();
 
@@ -236,9 +233,11 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
             self.inorder_traversal_rec(&curr.borrow().right, result);
         }
     }
-   pub fn height(&self) -> isize {
-    self.root.as_ref().map_or(0, |r| r.borrow().height)
-}
+
+    pub fn height(&self) -> isize {
+        self.root.as_ref().map_or(0, |r| r.borrow().height)
+    }
+
 }
 
 fn main() {
@@ -309,5 +308,7 @@ fn main() {
             }
         }
     }
+    println!("Initial In-order Traversal: {:?}", avl_tree.inorder_traversal());
+
 }
 
