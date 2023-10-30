@@ -1,6 +1,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::io;
+use std::fs::File;
+use std::io::prelude::*;
 
 type AVLTreePtr<T> = Option<Rc<RefCell<AVLNode<T>>>>;
 
@@ -237,6 +239,28 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
     pub fn height(&self) -> isize {
         self.root.as_ref().map_or(0, |r| r.borrow().height)
     }
+    pub fn to_dot(&self) -> String {
+        let mut dot = String::from("digraph AVLTree {\n");
+        self.to_dot_rec(&self.root, &mut dot);
+        dot.push_str("}\n");
+        dot
+    }
+    
+    fn to_dot_rec(&self, node: &AVLTreePtr<T>, output: &mut String) {
+        if let Some(curr) = node {
+            let curr_val = format!("{}", curr.borrow().value);
+            if let Some(left) = &curr.borrow().left {
+                let left_val = format!("{}", left.borrow().value);
+                output.push_str(&format!("    {} -> {} [label=\"L\"];\n", curr_val, left_val));
+                self.to_dot_rec(&curr.borrow().left, output);
+            }
+            if let Some(right) = &curr.borrow().right {
+                let right_val = format!("{}", right.borrow().value);
+                output.push_str(&format!("    {} -> {} [label=\"R\"];\n", curr_val, right_val));
+                self.to_dot_rec(&curr.borrow().right, output);
+            }
+        }
+    }
 
 }
 
@@ -256,6 +280,7 @@ fn main() {
         println!("6. Check if tree is empty");
         println!("7. Exit");
         println!("8. Print tree structure");
+        println!("9. Print DOT representation");
         println!("------------------------------------------");
         
         // Read user's choice
@@ -303,12 +328,36 @@ fn main() {
                 println!("Tree Structure:");
                 avl_tree.print_tree();
             },
+            Ok(9) => {
+                let dot_representation = avl_tree.to_dot();
+                println!("{}", dot_representation);
+                
+                // Save to a file
+                let mut file = File::create("output.dot").expect("Could not create file");
+                file.write_all(dot_representation.as_bytes()).expect("Could not write to file");
+                println!("DOT representation saved to output.dot");
+            }
+            
             _ => {
                 println!("Invalid choice! Please select a valid option from the menu.");
             }
         }
     }
-    println!("Initial In-order Traversal: {:?}", avl_tree.inorder_traversal());
+    // avl_tree.insert(10);
+    // avl_tree.insert(20);
+    // avl_tree.insert(30);
+    // avl_tree.insert(40);
+    // avl_tree.insert(50);
+    // avl_tree.insert(35);
+    // avl_tree.insert(45);
+    // avl_tree.insert(55);
+    // avl_tree.insert(36);
+    // avl_tree.insert(9);
+    // println!("Initial In-order Traversal: {:?}", avl_tree.inorder_traversal());
+    // println!("Tree Height: {}", avl_tree.height());
+    // println!("Leaves Count: {}", avl_tree.count_leaves());
+    // println!("Tree Structure:");
+    // avl_tree.print_tree();
 
 }
 

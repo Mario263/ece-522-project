@@ -1,0 +1,13 @@
+digraph AVLTree {
+    20 -> 10 [label="L"];
+    10 -> 5 [label="L"];
+    10 -> 15 [label="R"];
+    15 -> 12 [label="L"];
+    20 -> 40 [label="R"];
+    40 -> 30 [label="L"];
+    30 -> 25 [label="L"];
+    30 -> 35 [label="R"];
+    40 -> 49 [label="R"];
+    49 -> 45 [label="L"];
+    49 -> 50 [label="R"];
+}
