@@ -3,6 +3,25 @@ name = "ASp2"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
+# Dependencies
 [dependencies]
+
+# Development dependencies
+[dev-dependencies]
+criterion = "0.4.0"
+
+# Benchmarks
+[[bench]]
+name = "avl_insert_benchmark" # No .rs extension here
+harness = false
+
+[[bench]]
+name = "search_bench" # No .rs extension here
+harness = false
+
+[lib]
+name="ASp2"
+path="src/main.rs"
+
+[features]
+debug_print = []

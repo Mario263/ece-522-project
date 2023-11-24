@@ -6,17 +6,30 @@ use std::io::prelude::*;
 
 type AVLTreePtr<T> = Option<Rc<RefCell<AVLNode<T>>>>;
 
+#[cfg(feature = "debug_print")]
+macro_rules! debug_println {
+    ($($args:tt)*)=>{
+        println!($($args)*);
+    };
+}
+
+#[cfg(not(feature = "debug_print"))]
+macro_rules! debug_println {
+    ($($args:tt)*)=>{};
+}
+
+
 #[derive(Debug, Clone)]
-struct AVLNode<T: Ord + Clone> {
-    value: T,
-    left: AVLTreePtr<T>,
-    right: AVLTreePtr<T>,
-    height: isize,
+pub struct AVLNode<T: Ord + Clone> {
+    pub value: T,
+    pub left: AVLTreePtr<T>,
+    pub right: AVLTreePtr<T>,
+    pub height: isize,
 }
 
 #[derive(Debug)]
-struct AVLTree<T: Ord + Clone> {
-    root: AVLTreePtr<T>,
+pub struct AVLTree<T: Ord + Clone> {
+    pub root: AVLTreePtr<T>,
 }
 
 impl<T: Ord + Clone> AVLNode<T> {
@@ -125,7 +138,7 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
     }
 
     fn rotate_left(&self, x: Rc<RefCell<AVLNode<T>>>) -> Rc<RefCell<AVLNode<T>>> {
-        println!("Rotating left node with value: {}", x.borrow().value);
+        debug_println!("Rotating left node with value: {}", x.borrow().value);
 
         let y = x.borrow_mut().right.take().expect("rotate_left requires a right child");
         let t2 = y.borrow_mut().left.take();
@@ -143,7 +156,7 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
     
 
     fn rotate_right(&self, y: Rc<RefCell<AVLNode<T>>>) -> Rc<RefCell<AVLNode<T>>> {
-        println!("Rotating right node with value: {}", y.borrow().value);
+        debug_println!("Rotating right node with value: {}", y.borrow().value);
 
         let x = y.borrow_mut().left.take().unwrap();
         let t3 = x.borrow_mut().right.take();
@@ -261,12 +274,31 @@ impl<T: Ord + Clone + std::fmt::Display> AVLTree<T> {
             }
         }
     }
+    pub fn search(&self, value: T) -> bool {
+        self.search_rec(&self.root, value)
+    }
+
+    fn search_rec(&self, node: &AVLTreePtr<T>, value: T) -> bool {
+        match node {
+            Some(current_node) => {
+                let current_value = &current_node.borrow().value;
+                if *current_value == value {
+                    true
+                } else if value < *current_value {
+                    self.search_rec(&current_node.borrow().left, value)
+                } else {
+                    self.search_rec(&current_node.borrow().right, value)
+                }
+            },
+            None => false,
+        }
+    }
 
 }
 
 fn main() {
     let mut avl_tree = AVLTree::<i32>::new();
-    
+
     loop {
         // Display the menu
         println!("------------------------------------------");
@@ -281,12 +313,13 @@ fn main() {
         println!("7. Exit");
         println!("8. Print tree structure");
         println!("9. Print DOT representation");
+        println!("10. Search for an element");
         println!("------------------------------------------");
-        
+
         // Read user's choice
         let mut choice = String::new();
         io::stdin().read_line(&mut choice).expect("Failed to read line");
-        
+
         match choice.trim().parse::<u32>() {
             Ok(1) => {
                 println!("Enter the element to insert:");
@@ -325,7 +358,7 @@ fn main() {
                 break;
             },
             Ok(8) => {
-                println!("Tree Structure:");
+                #[cfg(feature="debug_print")]
                 avl_tree.print_tree();
             },
             Ok(9) => {
@@ -336,29 +369,23 @@ fn main() {
                 let mut file = File::create("output.dot").expect("Could not create file");
                 file.write_all(dot_representation.as_bytes()).expect("Could not write to file");
                 println!("DOT representation saved to output.dot");
-            }
-            
+            },
+            Ok(10) => {
+                println!("Enter the element to search:");
+                let mut element = String::new();
+                io::stdin().read_line(&mut element).expect("Failed to read line");
+                let element: i32 = element.trim().parse().expect("Please enter a valid number");
+
+                let found = avl_tree.search(element);
+                if found {
+                    println!("Element {} found in the AVL tree.", element);
+                } else {
+                    println!("Element {} not found in the AVL tree.", element);
+                }
+            },
             _ => {
                 println!("Invalid choice! Please select a valid option from the menu.");
             }
         }
     }
-    // avl_tree.insert(10);
-    // avl_tree.insert(20);
-    // avl_tree.insert(30);
-    // avl_tree.insert(40);
-    // avl_tree.insert(50);
-    // avl_tree.insert(35);
-    // avl_tree.insert(45);
-    // avl_tree.insert(55);
-    // avl_tree.insert(36);
-    // avl_tree.insert(9);
-    // println!("Initial In-order Traversal: {:?}", avl_tree.inorder_traversal());
-    // println!("Tree Height: {}", avl_tree.height());
-    // println!("Leaves Count: {}", avl_tree.count_leaves());
-    // println!("Tree Structure:");
-    // avl_tree.print_tree();
-
 }
-
-// new comment to test
