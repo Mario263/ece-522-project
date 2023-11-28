@@ -358,7 +358,7 @@ fn main() {
                 break;
             },
             Ok(8) => {
-                #[cfg(feature="debug_print")]
+                println!("Tree Structure");
                 avl_tree.print_tree();
             },
             Ok(9) => {
