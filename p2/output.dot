@@ -1,0 +1,6 @@
+digraph AVLTree {
+    6 -> 3 [label="L"];
+    3 -> 5 [label="R"];
+    6 -> 8 [label="R"];
+    8 -> 11 [label="R"];
+}
