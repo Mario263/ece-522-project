@@ -1,0 +1,10 @@
+/Users/mario/Desktop/FALL 2023/ECE 522 Software Engineering and Intelligent System /Group Project/testing/ece-522-project/ASp2/target/release/deps/walkdir-e2c690ade0354cf4.rmeta: /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/lib.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/dent.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/error.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/util.rs
+
+/Users/mario/Desktop/FALL 2023/ECE 522 Software Engineering and Intelligent System /Group Project/testing/ece-522-project/ASp2/target/release/deps/libwalkdir-e2c690ade0354cf4.rlib: /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/lib.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/dent.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/error.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/util.rs
+
+/Users/mario/Desktop/FALL 2023/ECE 522 Software Engineering and Intelligent System /Group Project/testing/ece-522-project/ASp2/target/release/deps/walkdir-e2c690ade0354cf4.d: /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/lib.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/dent.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/error.rs /Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/util.rs
+
+/Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/lib.rs:
+/Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/dent.rs:
+/Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/error.rs:
+/Users/mario/.cargo/registry/src/index.crates.io-6f17d22bba15001f/walkdir-2.4.0/src/util.rs:
